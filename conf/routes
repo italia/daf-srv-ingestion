@@ -1,0 +1,19 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+GET         /swagger.json                                                controllers.ApiHelpController.getResources
+GET         /swg-ui/                                                     controllers.Assets.at(path="/public/swagger",file="index.html")
+GET         /swg-ui/*file                                                controllers.Assets.at(path="/public/swagger",file)
+
+POST         /ingestion-manager/start                                    controllers.IngestionController.startFeed
+POST         /ingestion-manager/infer                                    controllers.IngestionController.infer
+
+#POST         /ingestion-manager/wewe                                    controllers.IngestionController.wewe
+
+#GET         /sso-manager/secured/login/:appName                         controllers.SSOController.login(appName:String)
+#GET         /sso-manager/internal/retriveCookie/:appName                controllers.SSOController.retriveCookieInternal(username:String,appName:String)
+#GET         /sso-manager/internal/retriveAdminCookie/:appName           controllers.SSOController.retriveAdminCookieInternal(appName:String)
+#POST        /sso-manager/managed/bi-open-login                          controllers.SSOController.biOpenLogin
+#GET          /:service/proxy/*path                                      controllers.RestServiceProxyController.proxy(service:String, path:String)
+

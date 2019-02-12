@@ -1,0 +1,83 @@
+//---- WORKFLOW ----
+{
+  "name": "feed-creation",
+  "description": "feed creation workflow",
+  "version": 1,
+  "tasks": [
+    {
+      "name": "spark-job-launch",
+      "taskReferenceName": "spark-job-launch",
+      "inputParameters": {
+        "input_spark_task": {
+			"code": [
+                    "import it.gov.daf.{CsvChars, SparkOperations}",
+                    "val schema = \"\"\"${workflow.input.feedInput.schemaString}\"\"\"",
+                    "val filePath = \"\"\"${workflow.input.feedInput.filePath}\"\"\"",
+                    "val isCsv=${workflow.input.feedInput.isCsv}",
+                    "val phUri = \"\"\"${workflow.input.feedInput.datasetPath}${workflow.input.feedInput.datasetName}\"\"\"",
+                    "val csvChars = CsvChars( \"\"\"${workflow.input.feedInput.csvChars.quote}\"\"\", \"\"\"${workflow.input.feedInput.csvChars.delimiter}\"\"\", \"\"\"${workflow.input.feedInput.csvChars.escape}\"\"\" )",
+                    "SparkOperations.callValidateIngestedFile(schema, filePath, isCsv, Some(csvChars), phUri, spark)"
+            ],
+            "authHeader": {
+                "name":"${workflow.input.feedInput.authHeader.name}",
+                "authType": "${workflow.input.feedInput.authHeader.authType}",
+                "token":"${workflow.input.feedInput.authHeader.token}"
+            }
+
+	    }
+      },
+      "type": "SIMPLE"
+    },
+    {
+      "name": "call-set-permission-on-folder",
+      "taskReferenceName": "set-permission-on-folder",
+      "inputParameters": {
+        "http_request": {
+          "uri": "${workflow.input.feedInput.env.sec-man-url}/hdfs/setACL${workflow.input.feedInput.datasetPath}?groupName=impala&groupType=user&permission=rwx",
+          "method": "POST",
+          "headers":{
+            "Authorization": "${workflow.input.feedInput.authHeader.authType} ${workflow.input.feedInput.authHeader.token}",
+            "Content-Type": "application/json"
+          }
+        }
+      },
+      "type": "HTTP"
+    },
+    {
+      "name": "call-create-table-on-file",
+      "taskReferenceName": "create-table-on-file",
+      "inputParameters": {
+        "http_request": {
+          "uri": "${workflow.input.feedInput.env.sec-man-url}/impala/createTableFromFile${workflow.input.feedInput.datasetPath}?schemaName=${workflow.input.feedInput.schemaName}&tableName=${workflow.input.feedInput.tableName}",
+          "method": "POST",
+          "headers":{
+            "Authorization": "${workflow.input.feedInput.authHeader.authType} ${workflow.input.feedInput.authHeader.token}",
+            "Content-Type": "application/json"
+          }
+        }
+      },
+      "type": "HTTP"
+    },
+    {
+      "name": "call-create-grant",
+      "taskReferenceName": "create-grant",
+      "inputParameters": {
+        "http_request": {
+          "uri": "${workflow.input.feedInput.env.sec-man-url}/impala/createGrant?schemaName=${workflow.input.feedInput.schemaName}&tableName=${workflow.input.feedInput.tableName}",
+          "method": "POST",
+          "headers":{
+            "Authorization": "${workflow.input.feedInput.authHeader.authType} ${workflow.input.feedInput.authHeader.token}",
+            "Content-Type": "application/json"
+          }
+        }
+      },
+      "type": "HTTP"
+    }
+  ],
+  "outputParameters": {
+    "status": "${spark-job-launch.output.result}"
+  },
+  "schemaVersion": 2
+}
+
+

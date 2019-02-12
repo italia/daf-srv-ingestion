@@ -1,0 +1,47 @@
+//-----TASK----
+[
+  {
+    "name": "spark-job-launch",
+    "retryCount": 3,
+    "timeoutSeconds": 1200,
+    "inputKeys": [
+      "input_spark_task"
+    ],
+    "outputKeys": [
+      "result"
+    ],
+    "timeoutPolicy": "TIME_OUT_WF",
+    "retryLogic": "FIXED",
+    "retryDelaySeconds": 600,
+    "responseTimeoutSeconds": 1200
+  },
+  {
+    "name": "call-set-permission-on-folder",
+    "retryCount": 3,
+    "timeoutSeconds": 1200,
+    "timeoutPolicy": "TIME_OUT_WF",
+    "retryLogic": "FIXED",
+    "retryDelaySeconds": 600,
+    "responseTimeoutSeconds": 1200
+  },
+  {
+    "name": "call-create-table-on-file",
+    "retryCount": 3,
+    "timeoutSeconds": 1200,
+    "timeoutPolicy": "TIME_OUT_WF",
+    "retryLogic": "FIXED",
+    "retryDelaySeconds": 600,
+    "responseTimeoutSeconds": 1200
+  },
+  {
+    "name": "call-create-grant",
+    "retryCount": 3,
+    "timeoutSeconds": 1200,
+    "timeoutPolicy": "TIME_OUT_WF",
+    "retryLogic": "FIXED",
+    "retryDelaySeconds": 600,
+    "responseTimeoutSeconds": 1200
+  }
+]
+
+

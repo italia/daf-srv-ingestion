@@ -1,0 +1,268 @@
+----CREA WORKFLOW--------------------------------------------
+{
+  "ownerApp": "string",
+  "createTime": 0,
+  "updateTime": 0,
+  "createdBy": "string",
+  "updatedBy": "string",
+  "name": "string",
+  "description": "string",
+  "version": 0,
+  "tasks": [
+    {
+      "name": "string",
+      "taskReferenceName": "string",
+      "description": "string",
+      "inputParameters": {},
+      "type": "string",
+      "dynamicTaskNameParam": "string",
+      "caseValueParam": "string",
+      "caseExpression": "string",
+      "decisionCases": {},
+      "dynamicForkJoinTasksParam": "string",
+      "dynamicForkTasksParam": "string",
+      "dynamicForkTasksInputParamName": "string",
+      "defaultCase": [
+        {}
+      ],
+      "forkTasks": [
+        [
+          {}
+        ]
+      ],
+      "startDelay": 0,
+      "subWorkflowParam": {
+        "name": "string",
+        "version": 0
+      },
+      "joinOn": [
+        "string"
+      ],
+      "sink": "string",
+      "optional": false,
+      "taskDefinition": {
+        "ownerApp": "string",
+        "createTime": 0,
+        "updateTime": 0,
+        "createdBy": "string",
+        "updatedBy": "string",
+        "name": "string",
+        "description": "string",
+        "retryCount": 0,
+        "timeoutSeconds": 0,
+        "inputKeys": [
+          "string"
+        ],
+        "outputKeys": [
+          "string"
+        ],
+        "timeoutPolicy": "RETRY",
+        "retryLogic": "FIXED",
+        "retryDelaySeconds": 0,
+        "responseTimeoutSeconds": 0,
+        "concurrentExecLimit": 0,
+        "inputTemplate": {},
+        "rateLimitPerFrequency": 0,
+        "rateLimitFrequencyInSeconds": 0
+      },
+      "rateLimited": false
+    }
+  ],
+  "inputParameters": [
+    "string"
+  ],
+  "outputParameters": {},
+  "failureWorkflow": "string",
+  "schemaVersion": 0,
+  "restartable": false,
+  "workflowStatusListenerEnabled": false
+}
+
+----
+{
+  "name": "feed_creation",
+  "description": "feed creation workflow",
+  "version": 1,
+  "tasks": [
+    {
+      "name": "task_uno",
+      "taskReferenceName": "prova_task",
+      "inputParameters": {
+        "input_task_uno": "${workflow.input.feedInput}"
+      },
+      "type": "SIMPLE"
+    }
+  ],
+  "outputParameters": {
+    "status": "${prova_task.output.result}"
+  },
+  "schemaVersion": 2
+}
+
+
+-----CREA TASK----------------------------------------------
+
+[
+  {
+    "ownerApp": "string",
+    "createTime": 0,
+    "updateTime": 0,
+    "createdBy": "string",
+    "updatedBy": "string",
+    "name": "string",
+    "description": "string",
+    "retryCount": 0,
+    "timeoutSeconds": 0,
+    "inputKeys": [
+      "string"
+    ],
+    "outputKeys": [
+      "string"
+    ],
+    "timeoutPolicy": "RETRY",
+    "retryLogic": "FIXED",
+    "retryDelaySeconds": 0,
+    "responseTimeoutSeconds": 0,
+    "concurrentExecLimit": 0,
+    "inputTemplate": {},
+    "rateLimitPerFrequency": 0,
+    "rateLimitFrequencyInSeconds": 0
+  }
+]
+
+
+[
+{
+  "name": "task_uno",
+  "retryCount": 3,// quante volta riprova prima di marcare il task (e workflow) definitivamente fallito
+  "timeoutSeconds": 1200,
+  "inputKeys": [
+    "input_task_uno"
+  ],
+  "outputKeys": [
+    "result"
+  ],
+  "timeoutPolicy": "TIME_OUT_WF",
+  "retryLogic": "FIXED",
+  "retryDelaySeconds": 600,// è dopo quanto il task è di nuovo pollabile
+  "responseTimeoutSeconds": 1200
+}
+]
+
+
+-----------------------------------------------------------------------------------------------------------
+
+
+
+---START WORKFLOW---------------
+{  
+   "name":"feed_creation",
+   "version":1,
+   "correlationId":"we",
+   "input":{  
+      "feedInput":{  
+         "isCsv":true,
+         "path":"file:////home/andrea/Desktop/samples/in/Agency_infer.csv",
+         "schemaString":"{\"type\":\"struct\",\"fields\":[{\"name\":\"agency_id\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"agency_name\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"agency_url\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"agency_timezone\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"agency_lang\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"agency_phone\",\"type\":\"string\",\"nullable\":true,\"metadata\":{}},{\"name\":\"num\",\"type\":\"integer\",\"nullable\":true,\"metadata\":{}}]}",
+         "csvChars":{  
+            "quote":"\"",
+            "delimiter":",",
+            "escape":"\\"
+         },
+         "datasetPhisicalUri":"file:////home/wewe",
+         "authHeader":{  
+            "name":"authorization",
+            "authType":"Basic",
+            "token":"YW5kcmVhQHRlc3QuaXQ6UGFzc3dvcmQx"
+         }
+      }
+   }
+}
+--------------------------------
+
+curl -X GET --header 'Accept: application/json' 'http://localhost:8080/api/tasks/poll/prova_task?workerid=sonoio'
+--->
+{
+  "taskType": "prova_task",
+  "status": "IN_PROGRESS",
+  "inputData": {
+    "esempio": "ciaoooo"
+  },
+  "referenceTaskName": "prova_task",
+  "retryCount": 0,
+  "seq": 1,
+  "pollCount": 1,
+  "taskDefName": "prova_task",
+  "scheduledTime": 1547550832952,
+  "startTime": 1547551033368,
+  "endTime": 0,
+  "updateTime": 1547551033379,
+  "startDelayInSeconds": 0,
+  "retried": false,
+  "executed": false,
+  "callbackFromWorker": true,
+  "responseTimeoutSeconds": 1200,
+  "workflowInstanceId": "5db47ff7-ba96-4c0c-8edc-963776e0dc14",
+  "workflowType": "create_feed",
+  "taskId": "e37d9e61-15c0-4270-9534-31a8fa7b0f40",
+  "callbackAfterSeconds": 0,
+  "workerId": "sonoio",
+  "workflowTask": {
+    "name": "prova_task",
+    "taskReferenceName": "prova_task",
+    "inputParameters": {
+      "esempio": "${workflow.input.param1}"
+    },
+    "type": "SIMPLE",
+    "startDelay": 0,
+    "optional": false,
+    "taskDefinition": {
+      "createTime": 1547550409060,
+      "name": "prova_task",
+      "retryCount": 3,
+      "timeoutSeconds": 1200,
+      "inputKeys": [
+        "esempio"
+      ],
+      "outputKeys": [
+        "result"
+      ],
+      "timeoutPolicy": "TIME_OUT_WF",
+      "retryLogic": "FIXED",
+      "retryDelaySeconds": 600,
+      "responseTimeoutSeconds": 1200,
+      "rateLimitPerFrequency": 0,
+      "rateLimitFrequencyInSeconds": 1
+    }
+  },
+  "rateLimitPerFrequency": 0,
+  "rateLimitFrequencyInSeconds": 0,
+  "taskDefinition": {
+    "present": true
+  },
+  "queueWaitTime": 200416,
+  "taskStatus": "IN_PROGRESS"
+}
+
+------------------------------------------------------------------------------------------------------------
+
+
+curl -X POST --header 'Content-Type: */*' --header 'Accept: application/json' 'http://localhost:8080/api/tasks/e37d9e61-15c0-4270-9534-31a8fa7b0f40/ack?workerid=sonoio'
+
+
+POST http://localhost:8080/api/tasks
+
+{
+  "workflowInstanceId": "5db47ff7-ba96-4c0c-8edc-963776e0dc14",
+  "taskId": "e37d9e61-15c0-4270-9534-31a8fa7b0f40",
+  "reasonForIncompletion": "fatto e basta",
+  "callbackAfterSeconds": 0,
+  "workerId": "sonoio",
+  "status": "COMPLETED",
+  "outputData": {"result":"weeeee"}
+  }
+
+
+
+
+

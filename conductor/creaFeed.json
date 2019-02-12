@@ -1,0 +1,91 @@
+---- WORKFLOW ----
+{
+  "name": "feed-creation",
+  "description": "feed creation workflow",
+  "version": 1,
+  "tasks": [
+    {
+      "name": "call-create-folder",
+      "taskReferenceName": "create-folder",
+      "inputParameters": {
+        "http_request": {
+          "uri": "${workflow.input.env.sec-man-url}/hdfs/proxy/${workflow.input.feedInput.datasetPath}?op=MKDIRS",
+          "method": "PUT",
+	  "headers":{
+			"${workflow.input.feedInput.authHeader.name}": "${workflow.input.feedInput.authHeader.authType} ${workflow.input.feedInput.authHeader.token}",
+			"Content-Type": "application/json"
+		    }
+        }
+      },
+      "type": "HTTP"
+    },
+    {
+      "name": "call-set-permission-on-folder",
+      "taskReferenceName": "set-permission-on-folder",
+      "inputParameters": {
+        "http_request": {
+          "uri": "${workflow.input.env.sec-man-url}/hdfs/proxy/${workflow.input.feedInput.datasetPath}?op=SETACL&aclspec=user:impala:rwx,user:hive:rwx,user::rwx,group::rwx,other::---",
+          "method": "PUT",
+	  "headers":{
+			"${workflow.input.feedInput.authHeader.name}": "${workflow.input.feedInput.authHeader.authType} ${workflow.input.feedInput.authHeader.token}",
+			"Content-Type": "application/json"
+		    }
+        }
+      },
+      "type": "HTTP"
+    },
+    {
+      "name": "spark-job-launch",
+      "taskReferenceName": "spark-job-launch",
+      "inputParameters": {
+        "input_spark_task": {
+			"code": "import it.gov.daf.{CsvChars, SparkOperations}\n   val schema = \"${workflow.input.feedInput.schemaString}\"\n    val path = \"${workflow.input.feedInput.filePath}\"\n    val isCsv= ${workflow.input.feedInput.isCsv}\n    val phUri = \"${workflow.input.feedInput.datasetPath}\"\n    val csvChars = \"${workflow.input.feedInput.csvChars}\"\n    SparkOperations.callValidateIngestedFile( schema, path, isCsv, csvChars, phUri, spark)",
+		"authHeader": {
+			"name":"${workflow.input.feedInput.authHeader.name}",
+			"authType": "${workflow.input.feedInput.authHeader.authType}",
+			"token":"${workflow.input.feedInput.authHeader.token}"
+		} 
+
+	}
+      },
+      "type": "SIMPLE"
+    },
+    {
+      "name": "call-create-table",
+      "taskReferenceName": "create-table",
+      "inputParameters": {
+        "input_task_uno": "${workflow.input.feedInput}"
+      },
+      "type": "HTTP"
+    },
+    {
+      "name": "call-set-permissions-on-table",
+      "taskReferenceName": "set-permissions-on-table",
+      "inputParameters": {
+        "input_task_uno": "${workflow.input.feedInput}"
+      },
+      "type": "HTTP"
+    },
+    {
+      "name": "send-notification",
+      "taskReferenceName": "send-notification",
+      "inputParameters": {
+        "input_task_uno": "${workflow.input.feedInput}"
+      },
+      "type": "HTTP"
+    },
+    {
+      "name": "call-mv-uploaded-file",
+      "taskReferenceName": "mv-uploaded-file",
+      "inputParameters": {
+        "input_task_uno": "${workflow.input.feedInput}"
+      },
+      "type": "HTTP"
+    },
+
+  ],
+  "outputParameters": {
+    "status": "${prova_task.output.result}"
+  },
+  "schemaVersion": 2
+}
