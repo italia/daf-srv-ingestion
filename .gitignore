@@ -1,0 +1,16 @@
+target
+.idea
+logs
+.DS_Store
+.history
+*/build
+*/conf/prodExt.conf
+*/conf/testExt.conf
+*/conf/prodLocal.conf
+*/conf/testLocal.conf
+localConfigs
+.ipynb_checkpoints
+*/conf/production/
+*/.ensime_cache/
+*/.ensime
+/project/Environment.scala

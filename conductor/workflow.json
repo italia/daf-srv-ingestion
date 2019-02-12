@@ -33,11 +33,11 @@
       "taskReferenceName": "set-permission-on-folder",
       "inputParameters": {
         "http_request": {
-          "uri": "${workflow.input.feedInput.env.sec-man-url}/hdfs/setACL${workflow.input.feedInput.datasetPath}?groupName=impala&groupType=user&permission=rwx",
-          "method": "POST",
+          "uri": "${workflow.input.feedInput.env.sec-man-url}/hdfs/setACL${workflow.input.feedInput.datasetPath}${workflow.input.feedInput.datasetName}.parquet?groupName=impala&groupType=user&permission=rwx",
+          "method": "PUT",
+          "body": {},
           "headers":{
-            "Authorization": "${workflow.input.feedInput.authHeader.authType} ${workflow.input.feedInput.authHeader.token}",
-            "Content-Type": "application/json"
+            "Authorization": "${workflow.input.feedInput.authHeader.authType} ${workflow.input.feedInput.authHeader.token}"
           }
         }
       },
@@ -48,11 +48,11 @@
       "taskReferenceName": "create-table-on-file",
       "inputParameters": {
         "http_request": {
-          "uri": "${workflow.input.feedInput.env.sec-man-url}/impala/createTableFromFile${workflow.input.feedInput.datasetPath}?schemaName=${workflow.input.feedInput.schemaName}&tableName=${workflow.input.feedInput.tableName}",
-          "method": "POST",
+          "uri": "${workflow.input.feedInput.env.sec-man-url}/impala/createTableFromFile${workflow.input.feedInput.datasetPath}${workflow.input.feedInput.datasetName}.parquet?schemaName=${workflow.input.feedInput.schemaName}&tableName=${workflow.input.feedInput.tableName}",
+          "method": "PUT",
+          "body": {},
           "headers":{
-            "Authorization": "${workflow.input.feedInput.authHeader.authType} ${workflow.input.feedInput.authHeader.token}",
-            "Content-Type": "application/json"
+            "Authorization": "${workflow.input.feedInput.authHeader.authType} ${workflow.input.feedInput.authHeader.token}"
           }
         }
       },
@@ -64,10 +64,10 @@
       "inputParameters": {
         "http_request": {
           "uri": "${workflow.input.feedInput.env.sec-man-url}/impala/createGrant?schemaName=${workflow.input.feedInput.schemaName}&tableName=${workflow.input.feedInput.tableName}",
-          "method": "POST",
+          "method": "PUT",
+          "body": {},
           "headers":{
-            "Authorization": "${workflow.input.feedInput.authHeader.authType} ${workflow.input.feedInput.authHeader.token}",
-            "Content-Type": "application/json"
+            "Authorization": "${workflow.input.feedInput.authHeader.authType} ${workflow.input.feedInput.authHeader.token}"
           }
         }
       },
@@ -79,5 +79,3 @@
   },
   "schemaVersion": 2
 }
-
-
