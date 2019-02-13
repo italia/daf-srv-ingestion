@@ -1,4 +1,3 @@
-//-----TASK----
 [
   {
     "name": "spark-job-launch",
@@ -41,7 +40,17 @@
     "retryLogic": "FIXED",
     "retryDelaySeconds": 600,
     "responseTimeoutSeconds": 1200
+  },
+  {
+    "name": "call-move-uploaded-file",
+    "retryCount": 3,
+    "timeoutSeconds": 1200,
+    "timeoutPolicy": "TIME_OUT_WF",
+    "retryLogic": "FIXED",
+    "retryDelaySeconds": 600,
+    "responseTimeoutSeconds": 1200
   }
+
 ]
 
 

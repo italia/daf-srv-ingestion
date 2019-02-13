@@ -6,10 +6,8 @@ GET         /swagger.json                                                control
 GET         /swg-ui/                                                     controllers.Assets.at(path="/public/swagger",file="index.html")
 GET         /swg-ui/*file                                                controllers.Assets.at(path="/public/swagger",file)
 
-POST         /ingestion-manager/start                                    controllers.IngestionController.startFeed
+POST         /ingestion-manager/startFeed                                controllers.IngestionController.startFeed
 POST         /ingestion-manager/infer                                    controllers.IngestionController.infer
-
-#POST         /ingestion-manager/wewe                                    controllers.IngestionController.wewe
 
 #GET         /sso-manager/secured/login/:appName                         controllers.SSOController.login(appName:String)
 #GET         /sso-manager/internal/retriveCookie/:appName                controllers.SSOController.retriveCookieInternal(username:String,appName:String)

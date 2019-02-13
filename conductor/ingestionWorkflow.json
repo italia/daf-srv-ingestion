@@ -1,7 +1,6 @@
-//---- WORKFLOW ----
 {
-  "name": "feed-creation",
-  "description": "feed creation workflow",
+  "name": "ingestion",
+  "description": "ingestion workflow",
   "version": 1,
   "tasks": [
     {
@@ -12,11 +11,11 @@
 			"code": [
                     "import it.gov.daf.{CsvChars, SparkOperations}",
                     "val schema = \"\"\"${workflow.input.feedInput.schemaString}\"\"\"",
-                    "val filePath = \"\"\"${workflow.input.feedInput.filePath}\"\"\"",
+                    "val file = \"\"\"${workflow.input.feedInput.file}\"\"\"",
                     "val isCsv=${workflow.input.feedInput.isCsv}",
                     "val phUri = \"\"\"${workflow.input.feedInput.datasetPath}${workflow.input.feedInput.datasetName}\"\"\"",
                     "val csvChars = CsvChars( \"\"\"${workflow.input.feedInput.csvChars.quote}\"\"\", \"\"\"${workflow.input.feedInput.csvChars.delimiter}\"\"\", \"\"\"${workflow.input.feedInput.csvChars.escape}\"\"\" )",
-                    "SparkOperations.callValidateIngestedFile(schema, filePath, isCsv, Some(csvChars), phUri, spark)"
+                    "SparkOperations.callValidateIngestedFile(schema, file, isCsv, Some(csvChars), phUri, spark)"
             ],
             "authHeader": {
                 "name":"${workflow.input.feedInput.authHeader.name}",
@@ -66,6 +65,20 @@
           "uri": "${workflow.input.feedInput.env.sec-man-url}/impala/createGrant?schemaName=${workflow.input.feedInput.schemaName}&tableName=${workflow.input.feedInput.tableName}",
           "method": "PUT",
           "body": {},
+          "headers":{
+            "Authorization": "${workflow.input.feedInput.authHeader.authType} ${workflow.input.feedInput.authHeader.token}"
+          }
+        }
+      },
+      "type": "HTTP"
+    },
+    {
+      "name": "call-move-uploaded-file",
+      "taskReferenceName": "move-uploaded-file",
+      "inputParameters": {
+        "http_request": {
+          "uri": "${workflow.input.feedInput.env.sec-man-url}/hdfs/proxy${workflow.input.feedInput.file}?op=RENAME&destination=${workflow.input.feedInput.archivePath}${workflow.input.feedInput.datasetName}-${spark-job-launch.workflowInstanceId}",
+          "method": "PUT",
           "headers":{
             "Authorization": "${workflow.input.feedInput.authHeader.authType} ${workflow.input.feedInput.authHeader.token}"
           }
