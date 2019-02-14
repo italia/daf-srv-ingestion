@@ -21,10 +21,10 @@ package it.gov.daf.model
 import it.gov.daf.model.ConductorModel.AuthHeader
 
 
-case class CreateFeedWorkflowInput( datasetName:String, isCsv:Boolean, file:String, archivePath:String, schemaString:String, csvChars:Option[CsvChars],
+case class IngestionWorkflowInput( datasetName:String, isCsv:Boolean, file:String, archivePath:String, schemaString:String, csvChars:Option[CsvChars],
                                     datasetPath:String, schemaName:String, tableName:String, authHeader: Option[AuthHeader], env:Option[Map[String,String]] ) extends PrettyPrintable
 
-case class CreateFeedWorkflow[A](name:String, version:Int, input:Map[String,A]) extends PrettyPrintable
+case class IngestionWorkflow[A](name:String, version:Int, input:Map[String,A]) extends PrettyPrintable
 
 case class CsvChars(quote:String, delimiter:String, escape:String) extends PrettyPrintable
 

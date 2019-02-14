@@ -43,7 +43,7 @@ import it.gov.daf.common.sso.common.CredentialManager
 import it.gov.daf.ingestion.config.DafServicesConfig
 import it.gov.daf.ingestion.worker.{LivyWork, TestWork, Worker}
 import it.gov.daf.model.ConductorModel.AuthHeader
-import it.gov.daf.model.{CreateFeedWorkflow, CreateFeedWorkflowInput}
+import it.gov.daf.model.{IngestionWorkflow, IngestionWorkflowInput}
 import org.pac4j.play.store.PlaySessionStore
 import play.api.libs.circe.Circe
 
@@ -146,17 +146,17 @@ class IngestionController @Inject()( configuration: Configuration, playSessionSt
   )
   @ApiImplicitParams(Array(
     new ApiImplicitParam(value = "Feed workflow input information", name="body payload",
-      required = true, dataType = "it.gov.daf.model.CreateFeedWorkflowInput", paramType = "body")
+      required = true, dataType = "it.gov.daf.model.IngestionWorkflowInput", paramType = "body")
     )
   )
-  def startFeed = Action.async( circe.json[CreateFeedWorkflowInput] ) { implicit request =>
+  def startFeed = Action.async( circe.json[IngestionWorkflowInput] ) { implicit request =>
 
     execInContext[Future[Result]]("startFeed") { () =>
       handleException{
 
-        def callStartWorkflow(input:CreateFeedWorkflowInput): Future[Either[String,String]] = {
+        def callStartWorkflow(input:IngestionWorkflowInput): Future[Either[String,String]] = {
 
-          val createFeedWorkflow = CreateFeedWorkflow("feed-creation", 1, Map("feedInput"->input))
+          val createFeedWorkflow = IngestionWorkflow("feed-creation", 1, Map("feedInput"->input))
 
           ConductorClient.startWorkflow(createFeedWorkflow).map{
             case ok@Right(_) => Worker.startSingleWorkerCycle( "spark-job-launch", 5.seconds, 20.minutes,
@@ -185,60 +185,47 @@ class IngestionController @Inject()( configuration: Configuration, playSessionSt
     }
   }
 
-/*
-  case class Prova( uno:String, due:Option[String])
-  def wewe = Action.async( circe.json[Prova] ) { implicit request =>
+  @ApiOperation(
+    value = "Start an ingestion workflow",
+    response = classOf[String]
+  )
+  @ApiImplicitParams(Array(
+    new ApiImplicitParam(value = "Ingestion workflow input information", name="body payload",
+      required = true, dataType = "it.gov.daf.model.IngestionWorkflowInput", paramType = "body")
+  )
+  )
+  def startIngestion = Action.async( circe.json[IngestionWorkflowInput] ) { implicit request =>
 
-    execInContext[Future[Result]]("wewe") { () =>
+    execInContext[Future[Result]]("startIngestion") { () =>
       handleException{
-        println("--->"+request.body)
-        Future.successful(Right(request.body))
+
+        def callStartWorkflow(input:IngestionWorkflowInput): Future[Either[String,String]] = {
+
+          val createFeedWorkflow = IngestionWorkflow("ingestion", 1, Map("ingestionInput"->input))
+
+          ConductorClient.startWorkflow(createFeedWorkflow).map{
+            case ok@Right(_) => Worker.startSingleWorkerCycle( "spark-job-launch", 5.seconds, 20.minutes,
+              new LivyWork( "input_spark_task", "result", Array("/uploads/atroisi/daf.jar") )
+            )
+              ok
+            case ko@Left(_) => ko
+          }
+
+        }
+
+        val authHeader = ("authorization", request.headers.get("authorization").get)
+        val inputDataWithCredential = request.body.copy( authHeader=Some(AuthHeader.fromHeaderValue( request.headers.get("Authorization") ).get), env=Some(Map("sec-man-url"->dafServicesConfig.proxyServiceUrl)) )
+
+        val res = for {
+          out <- EitherT(callStartWorkflow(inputDataWithCredential))
+        } yield out
+
+        res.value
 
       }
 
     }
-  }*/
-
-  /* Try{ callServices(request.body) } match{
-   case Success(x) => x.map{
-     case Right(xx) => Ok(xx)
-     case Left (ee) => InternalServerError(ee)
-   }
-   case Failure(e) => e.printStackTrace();Future.successful{ InternalServerError( e.getLocalizedMessage + e.getStackTrace.mkString("\n") ) }
- }*/
-
-  /*
-  def startIngestion = Action { implicit request =>
-    execInContext[Result]("startIngestion") { () =>
-
-
-      def workerFunc = { println("wewewewe")
-                         Thread.sleep(10000)
-                         "fattoo"}
-
-      startWorker(workerFunc,11.seconds)
-
-      Ok("todooo")
-
-    }
   }
-
-
-  private def startWorker(workerFunction: =>String,timeout:FiniteDuration):Unit = {
-
-    val f = Future{workerFunction}
-
-
-    val f1 = akka.pattern.after( timeout, actorSystem.scheduler )(Future.failed{new TimeoutException("timeouut")})
-    val f2 = Future.firstCompletedOf(List(f, f1))
-
-    f2.onComplete{
-      case Success(x) => println(x)
-      case Failure(e) => println(e)
-    }
-
-  }
-  */
 
 
 }

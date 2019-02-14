@@ -19,13 +19,14 @@
 package it.gov.daf.ingestion.worker
 
 import akka.actor.ActorSystem
-import it.gov.daf.model.CreateFeedWorkflowInput
+import it.gov.daf.model.IngestionWorkflowInput
+
 import scala.concurrent.Future
 
 
-class TestWork (implicit val actorSystem:ActorSystem) extends Work[CreateFeedWorkflowInput,String]{
+class TestWork (implicit val actorSystem:ActorSystem) extends Work[IngestionWorkflowInput,String]{
 
-  protected def executeImplementation(string:Map[String,CreateFeedWorkflowInput]):Future[ Either[String, Map[String,String]] ] = {
+  protected def executeImplementation(string:Map[String,IngestionWorkflowInput]):Future[ Either[String, Map[String,String]] ] = {
     val out = string.get("input_task_uno").get.toString+" elaborata"
     Future.successful( Right(Map("result"->out)) )
     //Future.successful( Left("gran casinooo") )

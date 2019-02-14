@@ -7,6 +7,8 @@ GET         /swg-ui/                                                     control
 GET         /swg-ui/*file                                                controllers.Assets.at(path="/public/swagger",file)
 
 POST         /ingestion-manager/startFeed                                controllers.IngestionController.startFeed
+POST         /ingestion-manager/startIngestion                           controllers.IngestionController.startIngestion
+
 POST         /ingestion-manager/infer                                    controllers.IngestionController.infer
 
 #GET         /sso-manager/secured/login/:appName                         controllers.SSOController.login(appName:String)

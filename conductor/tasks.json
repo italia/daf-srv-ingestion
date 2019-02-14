@@ -49,6 +49,15 @@
     "retryLogic": "FIXED",
     "retryDelaySeconds": 600,
     "responseTimeoutSeconds": 1200
+  },
+  {
+    "name": "call-refresh-table",
+    "retryCount": 3,
+    "timeoutSeconds": 1200,
+    "timeoutPolicy": "TIME_OUT_WF",
+    "retryLogic": "FIXED",
+    "retryDelaySeconds": 600,
+    "responseTimeoutSeconds": 1200
   }
 
 ]
