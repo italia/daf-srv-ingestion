@@ -58,7 +58,7 @@ object ConductorClient {
     logger.debug("pollTask")
 
     val workerId = taskType +"-"+DateTime.now(DateTimeZone.UTC).getMillis()+"-"+Thread.currentThread().getId
-    val wsRequest = ws.url(s"${dafServicesConfig.codnuctorServiceUrl}/api/tasks/poll/$taskType?workerid=$workerId").withHeaders(headers:_*)
+    val wsRequest = ws.url(s"${dafServicesConfig.conductorServiceUrl}/api/tasks/poll/$taskType?workerid=$workerId").withHeaders(headers:_*)
 
     logger.debug(s"pollTask request: $wsRequest")
 

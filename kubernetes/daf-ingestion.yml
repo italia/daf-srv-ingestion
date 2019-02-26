@@ -1,0 +1,88 @@
+apiVersion: v1
+kind: Service
+spec:
+  selector:
+    app: ingestion-manager
+  ports:
+  - targetPort: 9000
+    port: 9000
+  type: NodePort
+metadata:
+  annotations: {}
+  name: ingestion-manager
+  labels:
+    app: ingestion-manager
+---
+apiVersion: apps/v1
+kind: Deployment
+spec:
+  revisionHistoryLimit: 20
+  selector:
+    matchLabels:
+      app: ingestion-manager
+      logging: daf_app
+  strategy:
+    rollingUpdate:
+      maxSurge: 5
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    spec:
+      containers:
+      - image: nexus.daf.teamdigitale.it/daf-srv-injestion:0.0.1
+        imagePullPolicy: Always
+        env:
+        - value: -server -XX:+UseG1GC -XX:MaxGCPauseMillis=100 -XX:+PerfDisableSharedMem
+            -XX:+ParallelRefProcEnabled -Xmx2g -Xms2g -XX:MaxPermSize=1024m
+          name: JAVA_OPTS
+        - name: PLAY_CRYPTO
+          valueFrom:
+            secretKeyRef:
+              key: play_crypto
+              name: daf-secret
+        - name: PAC4J_CRYPTO
+          valueFrom:
+            secretKeyRef:
+              key: pac4j_crypto
+              name: daf-secret
+        - name: LDAP_USER_PWD
+          valueFrom:
+            secretKeyRef:
+              key: ldap_user_pwd
+              name: daf-secret
+
+        volumeMounts:
+        - subPath: application_ext.conf
+          name: config-volume
+          mountPath: /opt/docker/conf/application_ext.conf
+        - subPath: logback.xml
+          name: ingestion-manager-logback-volume
+          mountPath: /opt/docker/conf/logback.xml
+        resources:
+          limits:
+            memory: 3000Mi
+            cpu: 500m
+          requests:
+            cpu: 10m
+        name: ingestion-manager
+        ports:
+        - containerPort: 9000
+      imagePullSecrets:
+      - name: regsecret
+
+      volumes:
+      - configMap:
+          name: ingestion-manager-logback
+        name: ingestion-manager-logback-volume
+      - configMap:
+          name: ingestion-manager-conf
+        name: config-volume
+
+    metadata:
+      name: ingestion-manager
+      labels:
+        app: ingestion-manager
+        logging: daf_app
+  replicas: 1
+metadata:
+  name: ingestion-manager

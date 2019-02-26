@@ -1,6 +1,5 @@
 import Versions._
 import Environment._
-import com.typesafe.sbt.packager.docker.{Cmd, ExecCmd}
 
 organization in ThisBuild := "it.gov.daf"
 name := "daf-srv-injestion"
@@ -47,3 +46,24 @@ resolvers ++= Seq(
 // Play provides two styles of routers, one expects its actions to be injected, the
 // other, legacy style, accesses its actions statically.
 routesGenerator := InjectedRoutesGenerator
+
+
+
+dockerBaseImage := "anapsix/alpine-java:8_jdk_unlimited"
+
+dockerExposedPorts := Seq(9000)
+
+dockerEntrypoint := {Seq(s"bin/${name.value}", "-Dconfig.file=conf/application.conf")}
+
+dockerRepository := Option(nexus)
+
+
+publishTo in ThisBuild := {
+
+  if (isSnapshot.value)
+    Some("snapshots" at nexusUrl + "maven-snapshots/")
+  else
+    Some("releases"  at nexusUrl + "maven-releases/")
+}
+
+credentials += Credentials { Path.userHome / ".ivy2" / ".credentials" }
