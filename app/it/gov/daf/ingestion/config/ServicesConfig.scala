@@ -20,7 +20,7 @@ package it.gov.daf.ingestion.config
 
 import it.gov.daf.common.config.Read
 
-case class DafServicesConfig(inferSchemaUrl: String, coductorServiceUrl:String, proxyServiceUrl: String )
+case class DafServicesConfig(inferSchemaUrl: String, conductorServiceUrl:String, proxyServiceUrl: String )
 
 object DafServicesConfig {
 
@@ -28,11 +28,11 @@ object DafServicesConfig {
 
   def readValues = for {
     inferSchemaUrl              <- Read.string { "inferSchemaUrl" }.!
-    coductorServiceUrl          <- Read.string { "conductorServiceUrl" }.!
+    conductorServiceUrl          <- Read.string { "conductorServiceUrl" }.!
     proxyServiceUrl             <- Read.string { "proxyServiceUrl" }.!
   } yield DafServicesConfig(
     inferSchemaUrl = inferSchemaUrl,
-    coductorServiceUrl = coductorServiceUrl,
+    conductorServiceUrl = conductorServiceUrl,
     proxyServiceUrl= proxyServiceUrl
   )
 

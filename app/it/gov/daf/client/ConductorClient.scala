@@ -58,7 +58,7 @@ object ConductorClient {
     logger.debug("pollTask")
 
     val workerId = taskType +"-"+DateTime.now(DateTimeZone.UTC).getMillis()+"-"+Thread.currentThread().getId
-    val wsRequest = ws.url(s"${dafServicesConfig.coductorServiceUrl}/api/tasks/poll/$taskType?workerid=$workerId").withHeaders(headers:_*)
+    val wsRequest = ws.url(s"${dafServicesConfig.codnuctorServiceUrl}/api/tasks/poll/$taskType?workerid=$workerId").withHeaders(headers:_*)
 
     logger.debug(s"pollTask request: $wsRequest")
 
@@ -97,7 +97,7 @@ object ConductorClient {
     "status": "COMPLETED",
     "outputData": {"result":"weeeee"}
   }*/
-    val wsRequest = ws.url(s"${dafServicesConfig.coductorServiceUrl}/api/tasks").withHeaders(headers:_*)
+    val wsRequest = ws.url(s"${dafServicesConfig.conductorServiceUrl}/api/tasks").withHeaders(headers:_*)
     val jsonPost = taskPostRequest.asJson.noSpaces
 
     logger.debug(s"updateTask request: $wsRequest \njson: $jsonPost")
@@ -118,7 +118,7 @@ object ConductorClient {
     logger.debug("startWorkflow")
 
     val jsonPost = createFeedWorkflow.asJson.noSpaces
-    val wsRequest = ws.url(dafServicesConfig.coductorServiceUrl + "/api/workflow").withHeaders(headers:_*)
+    val wsRequest = ws.url(dafServicesConfig.conductorServiceUrl + "/api/workflow").withHeaders(headers:_*)
 
     logger.debug(s"startWorkflow request: $wsRequest \njson: $jsonPost")
 
