@@ -36,7 +36,7 @@ object LivyClient {
 
 
   private val logger = Logger(this.getClass.getName)
-  private val dafServicesConfig = DafConfig.apply
+  private val dafServicesConfig = DafConfig.apply.servicesConfig
 
   def getLivyUserSession(authHeader:AuthHeader)(implicit ws:WSClient):Future[Either[String,Option[LivySession]]] = {
 

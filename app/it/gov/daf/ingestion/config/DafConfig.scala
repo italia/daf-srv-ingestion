@@ -19,12 +19,14 @@
 package it.gov.daf.ingestion.config
 
 import com.google.inject.{Inject, Singleton}
-import it.gov.daf.common.config.ConfigReadException
+import it.gov.daf.common.config.{ConfigMissingException, ConfigReadException}
 import play.api.{Configuration, Environment}
 
 import scala.util.{Failure, Success}
 
 class DafConfig @Inject()(configuration: Configuration){
+
+  val hadoopIngestionJarPath:String = configuration.getString("hadoopIngestionJarPath").getOrElse( throw ConfigMissingException("hadoopIngestionJarPath") )
 
   val servicesConfig = DafServicesConfig.reader.read(configuration) match {
     case Success(config) => config
@@ -37,7 +39,8 @@ object DafConfig  {
 
   private val config = new DafConfig(Configuration.load(Environment.simple()))
 
-  def apply= config.servicesConfig
+  def apply = config
+
 
 }
 

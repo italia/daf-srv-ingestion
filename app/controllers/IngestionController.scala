@@ -40,10 +40,10 @@ import it.gov.daf.client.ConductorClient
 import it.gov.daf.common.authentication.Authentication
 import it.gov.daf.common.config.ConfigReadException
 import it.gov.daf.common.sso.common.CredentialManager
-import it.gov.daf.ingestion.config.DafServicesConfig
+import it.gov.daf.ingestion.config.{DafConfig, DafServicesConfig}
 import it.gov.daf.ingestion.worker.{LivyWork, TestWork, Worker}
 import it.gov.daf.model.ConductorModel.AuthHeader
-import it.gov.daf.model.{IngestionWorkflow, IngestionWorkflowInput}
+import it.gov.daf.model.{FeedWorkflowInput, IngestionWorkflowInput, Workflow}
 import org.pac4j.play.store.PlaySessionStore
 import play.api.libs.circe.Circe
 
@@ -58,10 +58,10 @@ class IngestionController @Inject()( configuration: Configuration, playSessionSt
 
   private val logger = Logger(this.getClass.getName)
 
-  val dafServicesConfig = DafServicesConfig.reader.read(configuration) match {
+  val dafServicesConfig = DafConfig.apply.servicesConfig/*DafServicesConfig.reader.read(configuration) match {
     case Success(config) => config
     case Failure(error)  => throw ConfigReadException(s"Unable to configure [daf services config]", error)
-  }
+  }*/
 
   // Not a REST API
   // Upload del file + infer
@@ -146,21 +146,21 @@ class IngestionController @Inject()( configuration: Configuration, playSessionSt
   )
   @ApiImplicitParams(Array(
     new ApiImplicitParam(value = "Feed workflow input information", name="body payload",
-      required = true, dataType = "it.gov.daf.model.IngestionWorkflowInput", paramType = "body")
+      required = true, dataType = "it.gov.daf.model.FeedWorkflowInput", paramType = "body")
     )
   )
-  def startFeed = Action.async( circe.json[IngestionWorkflowInput] ) { implicit request =>
+  def startFeed = Action.async( circe.json[FeedWorkflowInput] ) { implicit request =>
 
     execInContext[Future[Result]]("startFeed") { () =>
       handleException{
 
-        def callStartWorkflow(input:IngestionWorkflowInput): Future[Either[String,String]] = {
+        def callStartWorkflow(input:FeedWorkflowInput): Future[Either[String,String]] = {
 
-          val createFeedWorkflow = IngestionWorkflow("feed-creation", 1, Map("feedInput"->input))
+          val createFeedWorkflow = Workflow("feed-creation", 1, Map("feedInput"->input))
 
           ConductorClient.startWorkflow(createFeedWorkflow).map{
             case ok@Right(_) => Worker.startSingleWorkerCycle( "spark-job-launch", 5.seconds, 20.minutes,
-                                                                new LivyWork( "input_spark_task", "result", Array("/uploads/atroisi/daf.jar") )
+                                                                new LivyWork( "input_spark_task", "result", Array(DafConfig.apply.hadoopIngestionJarPath) )
                                                               )
                                 ok//Worker.startSingleRun("task_uno", 5.seconds, 5.minutes, 1.hour, new SparkWork(2.hour)); ok
             case ko@Left(_) => ko
@@ -201,11 +201,11 @@ class IngestionController @Inject()( configuration: Configuration, playSessionSt
 
         def callStartWorkflow(input:IngestionWorkflowInput): Future[Either[String,String]] = {
 
-          val createFeedWorkflow = IngestionWorkflow("ingestion", 1, Map("ingestionInput"->input))
+          val createFeedWorkflow = Workflow("ingestion", 1, Map("ingestionInput"->input))
 
           ConductorClient.startWorkflow(createFeedWorkflow).map{
             case ok@Right(_) => Worker.startSingleWorkerCycle( "spark-job-launch", 5.seconds, 20.minutes,
-              new LivyWork( "input_spark_task", "result", Array("/uploads/atroisi/daf.jar") )
+              new LivyWork( "input_spark_task", "result", Array(DafConfig.apply.hadoopIngestionJarPath) )
             )
               ok
             case ko@Left(_) => ko

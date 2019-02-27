@@ -24,7 +24,7 @@ import io.circe.parser.parse
 import io.circe.syntax._
 import it.gov.daf.ingestion.config.DafConfig
 import it.gov.daf.model.ConductorModel.{TaskPollResult, TaskPostRequest}
-import it.gov.daf.model.IngestionWorkflow
+import it.gov.daf.model.Workflow
 import org.joda.time.{DateTime, DateTimeZone}
 import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -48,7 +48,7 @@ object ConductorClient{
 object ConductorClient {
 
   private val logger = Logger(this.getClass.getName)
-  private val dafServicesConfig = DafConfig.apply
+  private val dafServicesConfig = DafConfig.apply.servicesConfig
 
   private val headers = Seq(("Content-Type", "application/json")) //,("Accept", "text/plain")
 
@@ -113,7 +113,7 @@ object ConductorClient {
   }
 
 
-  def startWorkflow[A:Encoder](createFeedWorkflow:IngestionWorkflow[A] )(implicit ws:WSClient): Future[Either[String, String]] = {
+  def startWorkflow[A:Encoder](createFeedWorkflow:Workflow[A] )(implicit ws:WSClient): Future[Either[String, String]] = {
 
     logger.debug("startWorkflow")
 

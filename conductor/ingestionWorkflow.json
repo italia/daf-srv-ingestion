@@ -9,13 +9,12 @@
       "inputParameters": {
         "input_spark_task": {
 			"code": [
-                    "import it.gov.daf.{CsvChars, SparkOperations}",
-                    "val schema = \"\"\"${workflow.input.ingestionInput.schemaString}\"\"\"",
+                    "import it.gov.daf.ingestion.hadoop.{CsvChars, SparkOperations}",
                     "val file = \"\"\"${workflow.input.ingestionInput.file}\"\"\"",
                     "val isCsv=${workflow.input.ingestionInput.isCsv}",
                     "val phUri = \"\"\"${workflow.input.ingestionInput.datasetPath}${workflow.input.ingestionInput.datasetName}\"\"\"",
                     "val csvChars = CsvChars( \"\"\"${workflow.input.ingestionInput.csvChars.quote}\"\"\", \"\"\"${workflow.input.ingestionInput.csvChars.delimiter}\"\"\", \"\"\"${workflow.input.ingestionInput.csvChars.escape}\"\"\" )",
-                    "SparkOperations.callValidateIngestedFile(schema, file, isCsv, Some(csvChars), phUri, spark)"
+                    "SparkOperations.callValidateIngestedFile(None, file, isCsv, Some(csvChars), phUri, spark)"
             ],
             "authHeader": {
                 "name":"${workflow.input.ingestionInput.authHeader.name}",
