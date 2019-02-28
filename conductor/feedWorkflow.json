@@ -15,7 +15,7 @@
                     "val isCsv=${workflow.input.feedInput.isCsv}",
                     "val phUri = \"\"\"${workflow.input.feedInput.datasetPath}${workflow.input.feedInput.datasetName}\"\"\"",
                     "val csvChars = CsvChars( \"\"\"${workflow.input.feedInput.csvChars.quote}\"\"\", \"\"\"${workflow.input.feedInput.csvChars.delimiter}\"\"\", \"\"\"${workflow.input.feedInput.csvChars.escape}\"\"\" )",
-                    "SparkOperations.callValidateIngestedFile( Some(schema), file, isCsv, Some(csvChars), phUri, spark )"
+                    "SparkOperations.callValidateIngestedFile( Some(schema), file, isCsv, Some(csvChars), phUri )(spark)"
             ],
             "authHeader": {
                 "name":"${workflow.input.feedInput.authHeader.name}",
@@ -32,7 +32,7 @@
       "taskReferenceName": "set-permission-on-folder",
       "inputParameters": {
         "http_request": {
-          "uri": "${workflow.input.feedInput.env.sec-man-url}/hdfs/setACL${workflow.input.feedInput.datasetPath}${workflow.input.feedInput.datasetName}.parquet?groupName=impala&groupType=user&permission=rwx",
+          "uri": "${workflow.input.feedInput.env.sec-man-url}/hdfs/setACL${workflow.input.feedInput.datasetPath}${workflow.input.feedInput.datasetName}?groupName=impala&groupType=user&permission=rwx",
           "method": "PUT",
           "body": {},
           "headers":{
@@ -47,7 +47,7 @@
       "taskReferenceName": "create-table-on-file",
       "inputParameters": {
         "http_request": {
-          "uri": "${workflow.input.feedInput.env.sec-man-url}/impala/createTableFromFile${workflow.input.feedInput.datasetPath}${workflow.input.feedInput.datasetName}.parquet?schemaName=${workflow.input.feedInput.schemaName}&tableName=${workflow.input.feedInput.tableName}",
+          "uri": "${workflow.input.feedInput.env.sec-man-url}/impala/createTableFromFile${workflow.input.feedInput.datasetPath}${workflow.input.feedInput.datasetName}?schemaName=${workflow.input.feedInput.dbName}&tableName=${workflow.input.feedInput.tableName}",
           "method": "PUT",
           "body": {},
           "headers":{
@@ -62,7 +62,7 @@
       "taskReferenceName": "create-grant",
       "inputParameters": {
         "http_request": {
-          "uri": "${workflow.input.feedInput.env.sec-man-url}/impala/createGrant?schemaName=${workflow.input.feedInput.schemaName}&tableName=${workflow.input.feedInput.tableName}",
+          "uri": "${workflow.input.feedInput.env.sec-man-url}/impala/createGrant?schemaName=${workflow.input.feedInput.dbName}&tableName=${workflow.input.feedInput.tableName}",
           "method": "PUT",
           "body": {},
           "headers":{

@@ -16,7 +16,7 @@
  *
  */
 
-package it.gov.daf
+package it.gov.daf.ingestion
 
 package object model {
 

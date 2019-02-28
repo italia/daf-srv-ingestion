@@ -19,7 +19,7 @@
 package it.gov.daf.ingestion.worker
 
 import akka.actor.ActorSystem
-import it.gov.daf.model.ConductorModel.AuthHeader
+import it.gov.daf.ingestion.model.ConductorModel.AuthHeader
 import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 

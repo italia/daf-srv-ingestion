@@ -16,16 +16,16 @@
  *
  */
 
-package it.gov.daf.model
+package it.gov.daf.ingestion.model
 
-import it.gov.daf.model.ConductorModel.AuthHeader
+import it.gov.daf.ingestion.model.ConductorModel.AuthHeader
 
 
 case class IngestionWorkflowInput( datasetName:String, isCsv:Boolean, file:String, archivePath:String, csvChars:Option[CsvChars],
-                                    datasetPath:String, schemaName:String, tableName:String, authHeader: Option[AuthHeader], env:Option[Map[String,String]] ) extends PrettyPrintable
+                                    datasetPath:String, dbName:String, tableName:String, authHeader: Option[AuthHeader], env:Option[Map[String,String]] ) extends PrettyPrintable
 
 case class FeedWorkflowInput( datasetName:String, isCsv:Boolean, file:String, archivePath:String, schemaString:String, csvChars:Option[CsvChars],
-                                   datasetPath:String, schemaName:String, tableName:String, authHeader: Option[AuthHeader], env:Option[Map[String,String]] ) extends PrettyPrintable
+                                   datasetPath:String, dbName:String, tableName:String, authHeader: Option[AuthHeader], env:Option[Map[String,String]] ) extends PrettyPrintable
 
 case class Workflow[A](name:String, version:Int, input:Map[String,A]) extends PrettyPrintable
 

@@ -16,7 +16,7 @@
  *
  */
 
-package it.gov.daf.model
+package it.gov.daf.ingestion.model
 
 import it.gov.daf.common.authentication.Authentication
 import org.apache.commons.codec.binary.Base64

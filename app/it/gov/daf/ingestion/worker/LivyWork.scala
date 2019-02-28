@@ -21,9 +21,9 @@ package it.gov.daf.ingestion.worker
 import akka.actor.ActorSystem
 import cats.data.EitherT
 import cats.implicits._
-import it.gov.daf.client.LivyClient
-import it.gov.daf.model.ConductorModel.AuthHeader
-import it.gov.daf.model.LivyModel.{LivySession, SessionRequest, Statement, StatementPost}
+import it.gov.daf.ingestion.client.LivyClient
+import it.gov.daf.ingestion.model.ConductorModel.AuthHeader
+import it.gov.daf.ingestion.model.LivyModel.{LivySession, SessionRequest, Statement, StatementPost}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.ws.WSClient
 

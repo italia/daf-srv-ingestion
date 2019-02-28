@@ -16,15 +16,15 @@
  *
  */
 
-package it.gov.daf.client
+package it.gov.daf.ingestion.client
 
 import io.circe.{Decoder, Encoder}
 import io.circe.generic.auto._
 import io.circe.parser.parse
 import io.circe.syntax._
 import it.gov.daf.ingestion.config.DafConfig
-import it.gov.daf.model.ConductorModel.{TaskPollResult, TaskPostRequest}
-import it.gov.daf.model.Workflow
+import it.gov.daf.ingestion.model.ConductorModel.{TaskPollResult, TaskPostRequest}
+import it.gov.daf.ingestion.model.Workflow
 import org.joda.time.{DateTime, DateTimeZone}
 import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext

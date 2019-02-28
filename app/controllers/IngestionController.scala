@@ -19,6 +19,7 @@
 
 package controllers
 
+import java.io.File
 import javax.inject.Inject
 
 import akka.actor.ActorSystem
@@ -28,7 +29,7 @@ import io.swagger.annotations.{ApiImplicitParams, _}
 import it.gov.daf.common.utils.RequestContext.execInContext
 import play.api.{Configuration, Logger}
 import play.api.libs.json.Json
-import play.api.libs.ws.WSClient
+import play.api.libs.ws.{StreamedBody, WSClient}
 import play.api.mvc.MultipartFormData.{DataPart, FilePart}
 import play.api.mvc._
 
@@ -36,14 +37,13 @@ import scala.concurrent.Future
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import cats.implicits._
 import io.circe.generic.auto._
-import it.gov.daf.client.ConductorClient
 import it.gov.daf.common.authentication.Authentication
-import it.gov.daf.common.config.ConfigReadException
 import it.gov.daf.common.sso.common.CredentialManager
+import it.gov.daf.ingestion.client.ConductorClient
 import it.gov.daf.ingestion.config.{DafConfig, DafServicesConfig}
 import it.gov.daf.ingestion.worker.{LivyWork, TestWork, Worker}
-import it.gov.daf.model.ConductorModel.AuthHeader
-import it.gov.daf.model.{FeedWorkflowInput, IngestionWorkflowInput, Workflow}
+import it.gov.daf.ingestion.model.ConductorModel.AuthHeader
+import it.gov.daf.ingestion.model.{FeedWorkflowInput, IngestionWorkflowInput, Workflow}
 import org.pac4j.play.store.PlaySessionStore
 import play.api.libs.circe.Circe
 
@@ -81,7 +81,9 @@ class IngestionController @Inject()( configuration: Configuration, playSessionSt
         val escape: Option[String] = request.body.dataParts.get("escape").flatMap(_.headOption)
         val isCsv: Boolean = request.body.dataParts.get("iscsv").flatMap(_.headOption).getOrElse("false") == "true"
 
-        val filePartList = request.body.file("sample").map(_.ref.file) match{
+        val fileOpt:Option[File] = request.body.file("sample").map(_.ref.file)
+
+        val filePartList = fileOpt match{
           case Some(file) => FilePart( "sample", file.getName, Option("text/plain"), FileIO.fromPath(file.toPath) ) :: List.empty
           case None => List.empty
         }
@@ -92,7 +94,10 @@ class IngestionController @Inject()( configuration: Configuration, playSessionSt
           Some(DataPart("iscsv", isCsv.toString))
 
         def checkInputData:Either[String,String] = datasetName match{
-          case Some(x) => Right("ok")
+          case Some(x) => fileOpt match{
+            case Some(y) => Right("ok")
+            case None => Left("A file must be uploaded")
+          }
           case None => Left("field datasetName cannot be empty")
         }
 
@@ -116,7 +121,8 @@ class IngestionController @Inject()( configuration: Configuration, playSessionSt
           val request = ws.url(dafServicesConfig.proxyServiceUrl + s"/hdfs/proxy/uploads/$username/feed/${datasetName.get}.${if (isCsv) "csv" else "json"}?op=CREATE").withHeaders(authHeader)
           logger.debug(s"request: $request")
 
-          request.put(Source(filePartList)).map { resp =>
+          val fileStream = FileIO.fromPath(fileOpt.get.toPath)
+          request.withBody(StreamedBody(fileStream)).execute("PUT").map { resp =>
             if (resp.status == OK)
               Right("ok")
             else
@@ -146,7 +152,7 @@ class IngestionController @Inject()( configuration: Configuration, playSessionSt
   )
   @ApiImplicitParams(Array(
     new ApiImplicitParam(value = "Feed workflow input information", name="body payload",
-      required = true, dataType = "it.gov.daf.model.FeedWorkflowInput", paramType = "body")
+      required = true, dataType = "it.gov.daf.ingestion.model.FeedWorkflowInput", paramType = "body")
     )
   )
   def startFeed = Action.async( circe.json[FeedWorkflowInput] ) { implicit request =>
@@ -159,9 +165,9 @@ class IngestionController @Inject()( configuration: Configuration, playSessionSt
           val createFeedWorkflow = Workflow("feed-creation", 1, Map("feedInput"->input))
 
           ConductorClient.startWorkflow(createFeedWorkflow).map{
-            case ok@Right(_) => Worker.startSingleWorkerCycle( "spark-job-launch", 5.seconds, 20.minutes,
+            case ok@Right(_) => /*Worker.startSingleWorkerCycle( "spark-job-launch", 5.seconds, 20.minutes,
                                                                 new LivyWork( "input_spark_task", "result", Array(DafConfig.apply.hadoopIngestionJarPath) )
-                                                              )
+                                                              )*/
                                 ok//Worker.startSingleRun("task_uno", 5.seconds, 5.minutes, 1.hour, new SparkWork(2.hour)); ok
             case ko@Left(_) => ko
           }
@@ -191,7 +197,7 @@ class IngestionController @Inject()( configuration: Configuration, playSessionSt
   )
   @ApiImplicitParams(Array(
     new ApiImplicitParam(value = "Ingestion workflow input information", name="body payload",
-      required = true, dataType = "it.gov.daf.model.IngestionWorkflowInput", paramType = "body")
+      required = true, dataType = "it.gov.daf.ingestion.model.IngestionWorkflowInput", paramType = "body")
   )
   )
   def startIngestion = Action.async( circe.json[IngestionWorkflowInput] ) { implicit request =>

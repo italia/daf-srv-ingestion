@@ -16,7 +16,7 @@
  *
  */
 
-package it.gov.daf.client
+package it.gov.daf.ingestion.client
 
 import cats.data.EitherT
 import io.circe.generic.auto._
@@ -24,8 +24,8 @@ import io.circe.parser.parse
 import io.circe.syntax._
 import it.gov.daf.common.utils.RequestContext
 import it.gov.daf.ingestion.config.DafConfig
-import it.gov.daf.model.ConductorModel.AuthHeader
-import it.gov.daf.model.LivyModel._
+import it.gov.daf.ingestion.model.ConductorModel.AuthHeader
+import it.gov.daf.ingestion.model.LivyModel._
 import play.api.Logger
 import play.api.libs.ws.{WSAuthScheme, WSClient}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext

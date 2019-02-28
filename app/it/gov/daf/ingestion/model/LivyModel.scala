@@ -16,9 +16,9 @@
  *
  */
 
-package it.gov.daf.model
+package it.gov.daf.ingestion.model
 
-import it.gov.daf.model.ConductorModel.AuthHeader
+import it.gov.daf.ingestion.model.ConductorModel.AuthHeader
 
 object LivyModel {
 

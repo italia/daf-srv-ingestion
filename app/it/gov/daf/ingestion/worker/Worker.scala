@@ -22,14 +22,16 @@ import akka.actor.ActorSystem
 import cats.data.EitherT
 import it.gov.daf.ingestion.config.DafConfig
 import play.api.libs.ws.WSClient
+
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import cats.implicits._
 import io.circe.{Decoder, Encoder}
-import it.gov.daf.client.ConductorClient
-import it.gov.daf.model.ConductorModel.{TaskPollResult, TaskPostRequest}
+import it.gov.daf.ingestion.client.ConductorClient
+import it.gov.daf.ingestion.model.ConductorModel.{TaskPollResult, TaskPostRequest}
 import play.api.Logger
+
 import scala.util.{Failure, Success}
 
 class Worker[A:Decoder, B:Encoder] private (taskType:String, pollingInterval:FiniteDuration, pollingTimeout:FiniteDuration, work:Work[A,B])

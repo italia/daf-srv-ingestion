@@ -19,7 +19,7 @@
 package it.gov.daf.ingestion.worker
 
 import akka.actor.ActorSystem
-import it.gov.daf.model.IngestionWorkflowInput
+import it.gov.daf.ingestion.model.IngestionWorkflowInput
 
 import scala.concurrent.Future
 

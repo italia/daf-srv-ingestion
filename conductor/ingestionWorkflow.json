@@ -14,7 +14,7 @@
                     "val isCsv=${workflow.input.ingestionInput.isCsv}",
                     "val phUri = \"\"\"${workflow.input.ingestionInput.datasetPath}${workflow.input.ingestionInput.datasetName}\"\"\"",
                     "val csvChars = CsvChars( \"\"\"${workflow.input.ingestionInput.csvChars.quote}\"\"\", \"\"\"${workflow.input.ingestionInput.csvChars.delimiter}\"\"\", \"\"\"${workflow.input.ingestionInput.csvChars.escape}\"\"\" )",
-                    "SparkOperations.callValidateIngestedFile(None, file, isCsv, Some(csvChars), phUri, spark)"
+                    "SparkOperations.callValidateIngestedFile(None, file, isCsv, Some(csvChars), phUri)(spark)"
             ],
             "authHeader": {
                 "name":"${workflow.input.ingestionInput.authHeader.name}",
@@ -31,7 +31,7 @@
       "taskReferenceName": "refresh-table",
       "inputParameters": {
         "http_request": {
-          "uri": "${workflow.input.ingestionInput.env.sec-man-url}/impala/refreshTable?schemaName=${workflow.input.ingestionInput.schemaName}&tableName=${workflow.input.ingestionInput.tableName}",
+          "uri": "${workflow.input.ingestionInput.env.sec-man-url}/impala/refreshTable?schemaName=${workflow.input.ingestionInput.dbName}&tableName=${workflow.input.ingestionInput.tableName}",
           "method": "PUT",
           "body": {},
           "headers":{
