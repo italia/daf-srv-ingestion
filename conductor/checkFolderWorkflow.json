@@ -1,0 +1,60 @@
+{
+  "name": "check-folder",
+  "description": "check folder workflow",
+  "version": 1,
+  "tasks": [
+
+    {
+      "name": "call-service",
+      "taskReferenceName": "check-invalids-folder",
+      "inputParameters": {
+        "http_request": {
+          "uri": "${workflow.input.feedInput.env.sec-man-url}/hdfs/checkFile${workflow.input.feedInput.datasetPath}${workflow.input.feedInput.datasetName}_invalids",
+          "method": "GET",
+          "body": {},
+          "headers":{
+            "Authorization": "${workflow.input.feedInput.authHeader.authType} ${workflow.input.feedInput.authHeader.token}"
+          }
+        }
+      },
+      "type": "HTTP"
+    },
+    {
+      "name": "call-service",
+      "taskReferenceName": "check-invalids-firstStage-folder",
+      "inputParameters": {
+        "http_request": {
+          "uri": "${workflow.input.feedInput.env.sec-man-url}/hdfs/checkFile${workflow.input.feedInput.datasetPath}${workflow.input.feedInput.datasetName}_invalids/firstStageParquet",
+          "method": "GET",
+          "body": {},
+          "headers":{
+            "Authorization": "${workflow.input.feedInput.authHeader.authType} ${workflow.input.feedInput.authHeader.token}"
+          }
+        }
+      },
+      "type": "HTTP"
+    },
+    {
+      "name": "call-service",
+      "taskReferenceName": "check-invalids-secondStage-folder",
+      "inputParameters": {
+        "http_request": {
+          "uri": "${workflow.input.feedInput.env.sec-man-url}/hdfs/checkFile${workflow.input.feedInput.datasetPath}${workflow.input.feedInput.datasetName}_invalids/secondStageParquet",
+          "method": "GET",
+          "body": {},
+          "headers":{
+            "Authorization": "${workflow.input.feedInput.authHeader.authType} ${workflow.input.feedInput.authHeader.token}"
+          }
+        }
+      },
+      "type": "HTTP"
+    }
+
+  ],
+  "outputParameters": {
+    "check-invalids-folder": "${check-invalids-folder.FileStatus.type}",
+    "check-invalids-firstStage-folder": "${check-invalids-firstStage-folder.FileStatus.type}",
+    "check-invalids-secondStage-folder": "${check-invalids-secondStage-folder.FileStatus.type}"
+  },
+  "schemaVersion": 2
+}
