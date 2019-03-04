@@ -3,6 +3,20 @@
   "description": "feed creation workflow",
   "version": 1,
   "tasks": [
+
+    {
+      "name": "check-folder-wf-task",
+      "taskReferenceName": "check-folder-wf",
+      "inputParameters": {
+        "checkInput": "${workflow.input.feedInput}"
+      },
+      "type": "SUB_WORKFLOW",
+      "subWorkflowParam": {
+        "name": "check-folder",
+        "version": 1
+      }
+    },
+
     {
       "name": "spark-job-launch",
       "taskReferenceName": "spark-job-launch",
@@ -28,22 +42,22 @@
       "type": "SIMPLE"
     },
     {
-      "name": "call-set-permission-on-folder",
-      "taskReferenceName": "set-permission-on-folder",
-      "inputParameters": {
-        "http_request": {
-          "uri": "${workflow.input.feedInput.env.sec-man-url}/hdfs/setACL${workflow.input.feedInput.datasetPath}${workflow.input.feedInput.datasetName}?groupName=impala&groupType=user&permission=rwx",
-          "method": "PUT",
-          "body": {},
-          "headers":{
-            "Authorization": "${workflow.input.feedInput.authHeader.authType} ${workflow.input.feedInput.authHeader.token}"
-          }
+    "name": "call-service",
+    "taskReferenceName": "set-permission-on-folder",
+    "inputParameters": {
+      "http_request": {
+        "uri": "${workflow.input.feedInput.env.sec-man-url}/hdfs/setACL${workflow.input.feedInput.datasetPath}${workflow.input.feedInput.datasetName}?groupName=impala&groupType=user&permission=rwx",
+        "method": "PUT",
+        "body": {},
+        "headers":{
+          "Authorization": "${workflow.input.feedInput.authHeader.authType} ${workflow.input.feedInput.authHeader.token}"
         }
-      },
-      "type": "HTTP"
+      }
+    },
+    "type": "HTTP"
     },
     {
-      "name": "call-create-table-on-file",
+      "name": "call-service",
       "taskReferenceName": "create-table-on-file",
       "inputParameters": {
         "http_request": {
@@ -58,7 +72,7 @@
       "type": "HTTP"
     },
     {
-      "name": "call-create-grant",
+      "name": "call-service",
       "taskReferenceName": "create-grant",
       "inputParameters": {
         "http_request": {
@@ -73,7 +87,20 @@
       "type": "HTTP"
     },
     {
-      "name": "call-move-uploaded-file",
+      "name": "invalids-initialization-wf-task",
+      "taskReferenceName": "invalids-initialization-wf",
+      "inputParameters": {
+        "invalidsInput": "${workflow.input.feedInput}",
+        "init":"${check-folder-wf.output}"
+      },
+      "type": "SUB_WORKFLOW",
+      "subWorkflowParam": {
+        "name": "invalids-initialization",
+        "version": 1
+      }
+    },
+    {
+      "name": "call-service",
       "taskReferenceName": "move-uploaded-file",
       "inputParameters": {
         "http_request": {

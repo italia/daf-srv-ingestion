@@ -1,0 +1,155 @@
+{
+  "name": "invalids-initialization",
+  "description": "initializations steps to handle invalids records",
+  "version": 1,
+  "tasks": [
+
+    {
+      "name": "check-folder-wf-task",
+      "taskReferenceName": "check-folder-wf",
+      "inputParameters": {
+        "checkInput": "${workflow.input.invalidsInput}"
+      },
+      "type": "SUB_WORKFLOW",
+      "subWorkflowParam": {
+        "name": "check-folder",
+        "version": 1
+      }
+    },
+
+    {
+      "name": "decide-task",
+      "taskReferenceName": "decide1",
+      "inputParameters": {
+        "case_value_param1": "${check-folder-wf.output.check-invalids-folder}",
+        "case_value_param2": "${workflow.input.init.check-invalids-folder}"
+      },
+      "type": "DECISION",
+      "caseExpression": "($.case_value_param1 !== null && $.case_value_param2 === null) ? 'OK' : 'KO'",
+      "defaultCase":[],
+      "decisionCases": {
+        "OK": [
+          {
+            "name": "call-service",
+            "taskReferenceName": "set-permission-on-invalids-folder",
+            "inputParameters": {
+              "http_request": {
+                "uri": "${workflow.input.invalidsInput.env.sec-man-url}/hdfs/setACL${workflow.input.invalidsInput.datasetPath}${workflow.input.invalidsInput.datasetName}_invalids?groupName=impala&groupType=user&permission=rwx",
+                "method": "PUT",
+                "body": {},
+                "headers":{
+                  "Authorization": "${workflow.input.invalidsInput.authHeader.authType} ${workflow.input.invalidsInput.authHeader.token}"
+                }
+              }
+            },
+            "type": "HTTP"
+          }
+
+        ]
+      }
+    },
+
+    {
+      "name": "decide-task",
+      "taskReferenceName": "decide2",
+      "inputParameters": {
+        "case_value_param1": "${check-folder-wf.output.check-invalids-firstStage-folder}",
+        "case_value_param2": "${workflow.input.init.check-invalids-firstStage-folder}"
+      },
+      "type": "DECISION",
+      "caseExpression": "($.case_value_param1 !== null && $.case_value_param2 === null) ? 'OK' : 'KO'",
+      "decisionCases": {
+        "OK": [
+
+          {
+            "name": "call-service",
+            "taskReferenceName": "create-table-on-file",
+            "inputParameters": {
+              "http_request": {
+                "uri": "${workflow.input.invalidsInput.env.sec-man-url}/impala/createTableFromFile${workflow.input.invalidsInput.datasetPath}${workflow.input.invalidsInput.datasetName}_invalids/firstStageParquet?schemaName=${workflow.input.invalidsInput.dbName}&tableName=${workflow.input.invalidsInput.tableName}_invalids_1s",
+                "method": "PUT",
+                "body": {},
+                "headers":{
+                  "Authorization": "${workflow.input.invalidsInput.authHeader.authType} ${workflow.input.invalidsInput.authHeader.token}"
+                }
+              }
+            },
+            "type": "HTTP"
+          },
+
+          {
+            "name": "call-service",
+            "taskReferenceName": "create-grant",
+            "inputParameters": {
+              "http_request": {
+                "uri": "${workflow.input.invalidsInput.env.sec-man-url}/impala/createGrant?schemaName=${workflow.input.invalidsInput.dbName}&tableName=${workflow.input.invalidsInput.tableName}_invalids_1s",
+                "method": "PUT",
+                "body": {},
+                "headers":{
+                  "Authorization": "${workflow.input.invalidsInput.authHeader.authType} ${workflow.input.invalidsInput.authHeader.token}"
+                }
+              }
+            },
+            "type": "HTTP"
+          }
+
+        ]
+      }
+    },
+
+    {
+      "name": "decide-task",
+      "taskReferenceName": "decide3",
+      "inputParameters": {
+        "case_value_param1": "${check-folder-wf.output.check-invalids-secondStage-folder}",
+        "case_value_param2": "${workflow.input.init.check-invalids-secondStage-folder}"
+      },
+      "type": "DECISION",
+      "caseExpression": "($.case_value_param1 !== null && $.case_value_param2 === null) ? 'OK' : 'KO'",
+      "decisionCases": {
+        "OK": [
+
+          {
+            "name": "call-service",
+            "taskReferenceName": "create-table-on-file",
+            "inputParameters": {
+              "http_request": {
+                "uri": "${workflow.input.invalidsInput.env.sec-man-url}/impala/createTableFromFile${workflow.input.invalidsInput.datasetPath}${workflow.input.invalidsInput.datasetName}_invalids/secondStageParquet?schemaName=${workflow.input.invalidsInput.dbName}&tableName=${workflow.input.invalidsInput.tableName}_invalids_2s",
+                "method": "PUT",
+                "body": {},
+                "headers":{
+                  "Authorization": "${workflow.input.invalidsInput.authHeader.authType} ${workflow.input.invalidsInput.authHeader.token}"
+                }
+              }
+            },
+            "type": "HTTP"
+          },
+
+          {
+            "name": "call-service",
+            "taskReferenceName": "create-grant",
+            "inputParameters": {
+              "http_request": {
+                "uri": "${workflow.input.invalidsInput.env.sec-man-url}/impala/createGrant?schemaName=${workflow.input.invalidsInput.dbName}&tableName=${workflow.input.invalidsInput.tableName}_invalids_2s",
+                "method": "PUT",
+                "body": {},
+                "headers":{
+                  "Authorization": "${workflow.input.invalidsInput.authHeader.authType} ${workflow.input.invalidsInput.authHeader.token}"
+                }
+              }
+            },
+            "type": "HTTP"
+          }
+
+        ]
+      }
+    }
+
+  ],
+  "outputParameters": {
+    "check-invalids-folder": "${check-folder-wf.output.check-invalids-folder}",
+    "check-invalids-firstStage-folder": "${check-folder-wf.output.check-invalids-firstStage-folder}",
+    "check-invalids-secondStage-folder": "${check-folder-wf.output.check-invalids-secondStage-folder}"
+  },
+  "schemaVersion": 2
+}

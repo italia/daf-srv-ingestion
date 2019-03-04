@@ -1,4 +1,5 @@
 [
+
   {
     "name": "spark-job-launch",
     "retryCount": 3,
@@ -14,8 +15,9 @@
     "retryDelaySeconds": 600,
     "responseTimeoutSeconds": 1200
   },
+
   {
-    "name": "call-set-permission-on-folder",
+    "name": "call-service",
     "retryCount": 3,
     "timeoutSeconds": 1200,
     "timeoutPolicy": "TIME_OUT_WF",
@@ -23,35 +25,9 @@
     "retryDelaySeconds": 600,
     "responseTimeoutSeconds": 1200
   },
+
   {
-    "name": "call-create-table-on-file",
-    "retryCount": 3,
-    "timeoutSeconds": 1200,
-    "timeoutPolicy": "TIME_OUT_WF",
-    "retryLogic": "FIXED",
-    "retryDelaySeconds": 600,
-    "responseTimeoutSeconds": 1200
-  },
-  {
-    "name": "call-create-grant",
-    "retryCount": 3,
-    "timeoutSeconds": 1200,
-    "timeoutPolicy": "TIME_OUT_WF",
-    "retryLogic": "FIXED",
-    "retryDelaySeconds": 600,
-    "responseTimeoutSeconds": 1200
-  },
-  {
-    "name": "call-move-uploaded-file",
-    "retryCount": 3,
-    "timeoutSeconds": 1200,
-    "timeoutPolicy": "TIME_OUT_WF",
-    "retryLogic": "FIXED",
-    "retryDelaySeconds": 600,
-    "responseTimeoutSeconds": 1200
-  },
-  {
-    "name": "call-refresh-table",
+    "name": "decide-task",
     "retryCount": 3,
     "timeoutSeconds": 1200,
     "timeoutPolicy": "TIME_OUT_WF",

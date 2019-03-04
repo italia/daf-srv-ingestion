@@ -4,6 +4,18 @@
   "version": 1,
   "tasks": [
     {
+      "name": "check-folder-wf-task",
+      "taskReferenceName": "check-folder-wf",
+      "inputParameters": {
+        "checkInput": "${workflow.input.ingestionInput}"
+      },
+      "type": "SUB_WORKFLOW",
+      "subWorkflowParam": {
+        "name": "check-folder",
+        "version": 1
+      }
+    },
+    {
       "name": "spark-job-launch",
       "taskReferenceName": "spark-job-launch",
       "inputParameters": {
@@ -27,7 +39,7 @@
       "type": "SIMPLE"
     },
     {
-      "name": "call-refresh-table",
+      "name": "call-service",
       "taskReferenceName": "refresh-table",
       "inputParameters": {
         "http_request": {
@@ -41,8 +53,89 @@
       },
       "type": "HTTP"
     },
+
     {
-      "name": "call-move-uploaded-file",
+      "name": "invalids-initialization-wf-task",
+      "taskReferenceName": "invalids-initialization-wf",
+      "inputParameters": {
+        "invalidsInput": "${workflow.input.ingestionInput}",
+        "init":"${check-folder-wf.output}"
+      },
+      "type": "SUB_WORKFLOW",
+      "subWorkflowParam": {
+        "name": "invalids-initialization",
+        "version": 1
+      }
+    },
+
+
+    {
+      "name": "decide-task",
+      "taskReferenceName": "decide1",
+      "inputParameters": {
+        "case_value_param1": "${check-folder-wf.output.check-invalids-firstStage-folder}",
+        "case_value_param2": "${invalids-initialization-wf.output.check-invalids-firstStage-folder}"
+      },
+      "type": "DECISION",
+      "caseExpression": "($.case_value_param1 !== null && $.case_value_param2 !== null) ? 'OK' : 'KO'",
+      "defaultCase":[],
+      "decisionCases": {
+        "OK": [
+          {
+            "name": "call-service",
+            "taskReferenceName": "refresh-table",
+            "inputParameters": {
+              "http_request": {
+                "uri": "${workflow.input.ingestionInput.env.sec-man-url}/impala/refreshTable?schemaName=${workflow.input.ingestionInput.dbName}&tableName=${workflow.input.ingestionInput.tableName}_invalids_1s",
+                "method": "PUT",
+                "body": {},
+                "headers":{
+                  "Authorization": "${workflow.input.ingestionInput.authHeader.authType} ${workflow.input.ingestionInput.authHeader.token}"
+                }
+              }
+            },
+            "type": "HTTP"
+          }
+
+        ]
+      }
+    },
+
+    {
+      "name": "decide-task",
+      "taskReferenceName": "decide2",
+      "inputParameters": {
+        "case_value_param1": "${check-folder-wf.output.check-invalids-secondStage-folder}",
+        "case_value_param2": "${invalids-initialization-wf.output.check-invalids-secondStage-folder}"
+      },
+      "type": "DECISION",
+      "caseExpression": "($.case_value_param1 !== null && $.case_value_param2 !== null) ? 'OK' : 'KO'",
+      "decisionCases": {
+        "OK": [
+
+          {
+            "name": "call-service",
+            "taskReferenceName": "refresh-table",
+            "inputParameters": {
+              "http_request": {
+                "uri": "${workflow.input.ingestionInput.env.sec-man-url}/impala/refreshTable?schemaName=${workflow.input.ingestionInput.dbName}&tableName=${workflow.input.ingestionInput.tableName}_invalids_2s",
+                "method": "PUT",
+                "body": {},
+                "headers":{
+                  "Authorization": "${workflow.input.ingestionInput.authHeader.authType} ${workflow.input.ingestionInput.authHeader.token}"
+                }
+              }
+            },
+            "type": "HTTP"
+          }
+
+        ]
+      }
+    },
+
+
+    {
+      "name": "call-service",
       "taskReferenceName": "move-uploaded-file",
       "inputParameters": {
         "http_request": {
