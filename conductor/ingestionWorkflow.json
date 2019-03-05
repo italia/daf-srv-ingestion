@@ -83,7 +83,7 @@
         "OK": [
           {
             "name": "call-service",
-            "taskReferenceName": "refresh-table",
+            "taskReferenceName": "refresh-invalid1-table",
             "inputParameters": {
               "http_request": {
                 "uri": "${workflow.input.ingestionInput.env.sec-man-url}/impala/refreshTable?schemaName=${workflow.input.ingestionInput.dbName}&tableName=${workflow.input.ingestionInput.tableName}_invalids_1s",
@@ -115,7 +115,7 @@
 
           {
             "name": "call-service",
-            "taskReferenceName": "refresh-table",
+            "taskReferenceName": "refresh-invalid2-table",
             "inputParameters": {
               "http_request": {
                 "uri": "${workflow.input.ingestionInput.env.sec-man-url}/impala/refreshTable?schemaName=${workflow.input.ingestionInput.dbName}&tableName=${workflow.input.ingestionInput.tableName}_invalids_2s",

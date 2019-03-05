@@ -63,7 +63,7 @@
 
           {
             "name": "call-service",
-            "taskReferenceName": "create-table-on-file",
+            "taskReferenceName": "create-table-on-file-invalids1",
             "inputParameters": {
               "http_request": {
                 "uri": "${workflow.input.invalidsInput.env.sec-man-url}/impala/createTableFromFile${workflow.input.invalidsInput.datasetPath}${workflow.input.invalidsInput.datasetName}_invalids/firstStageParquet?schemaName=${workflow.input.invalidsInput.dbName}&tableName=${workflow.input.invalidsInput.tableName}_invalids_1s",
@@ -79,7 +79,7 @@
 
           {
             "name": "call-service",
-            "taskReferenceName": "create-grant",
+            "taskReferenceName": "create-grant-invalids1",
             "inputParameters": {
               "http_request": {
                 "uri": "${workflow.input.invalidsInput.env.sec-man-url}/impala/createGrant?schemaName=${workflow.input.invalidsInput.dbName}&tableName=${workflow.input.invalidsInput.tableName}_invalids_1s",
@@ -111,7 +111,7 @@
 
           {
             "name": "call-service",
-            "taskReferenceName": "create-table-on-file",
+            "taskReferenceName": "create-table-on-file-invalids2",
             "inputParameters": {
               "http_request": {
                 "uri": "${workflow.input.invalidsInput.env.sec-man-url}/impala/createTableFromFile${workflow.input.invalidsInput.datasetPath}${workflow.input.invalidsInput.datasetName}_invalids/secondStageParquet?schemaName=${workflow.input.invalidsInput.dbName}&tableName=${workflow.input.invalidsInput.tableName}_invalids_2s",
@@ -127,7 +127,7 @@
 
           {
             "name": "call-service",
-            "taskReferenceName": "create-grant",
+            "taskReferenceName": "create-grant-invalids2",
             "inputParameters": {
               "http_request": {
                 "uri": "${workflow.input.invalidsInput.env.sec-man-url}/impala/createGrant?schemaName=${workflow.input.invalidsInput.dbName}&tableName=${workflow.input.invalidsInput.tableName}_invalids_2s",

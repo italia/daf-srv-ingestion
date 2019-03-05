@@ -20,9 +20,19 @@ package it.gov.daf.ingestion
 
 package object model {
 
+
   trait PrettyPrintable {
 
     override def toString: String = prettyPrint(this)
+
+    /*
+    private def prettyPrint(a: Any): String = {
+
+      //pprint.apply(a).toString()
+      pprint.tokenize(a, width = 5).mkString
+
+    }*/
+
     /**
       * Pretty prints a Scala value similar to its source represention.
       * Particularly useful for case classes.
@@ -32,6 +42,7 @@ package object model {
       * @param depth - Initial depth to pretty print indents.
       * @return
       */
+
     private def prettyPrint(a: Any, indentSize: Int = 2, maxElementWidth: Int = 30, depth: Int = 0): String = {
       val indent = " " * depth * indentSize
       val fieldIndent = indent + (" " * indentSize)
@@ -57,6 +68,8 @@ package object model {
           val result = xs.map(x => s"\n$fieldIndent${nextDepth(x)}").toString()
           result.substring(0, result.length - 1) + "\n" + indent + ")"
         // Product should cover case classes.
+        case Some(x) if x.isInstanceOf[Array[String]] =>  val array = x.asInstanceOf[Array[String]] // added to handle arrays
+                                                          s"Some(${array.mkString(s",$indent")})"
         case p: Product =>
           val prefix = p.productPrefix
           // We'll use reflection to get the constructor arg names and values.
@@ -79,10 +92,52 @@ package object model {
               // Otherwise, build it with newlines and proper field indents.
               s"$prefix(\n${prettyFields.mkString(",\n")}\n$indent)"
           }
+
+        case array:Array[String] => {array.mkString(s",$indent")}// added to handle arrays
         // If we haven't specialized this type, just use its toString.
-        case _ => a.toString
+        case _ => s"${a.toString}   (${a.getClass.getCanonicalName})"
       }
     }
+
+
+
+   /**
+    * Pretty prints case classes with field names.
+    * Handles sequences and arrays of such values.
+    * Ideally, one could take the output and paste it into source code and have it compile.
+      */
+   /*
+    def prettyPrint(a: Any): String = {
+      import java.lang.reflect.Field
+      // Recursively get all the fields; this will grab vals declared in parents of case classes.
+      def getFields(cls: Class[_]): List[Field] =
+        Option(cls.getSuperclass).map(getFields).getOrElse(Nil) ++
+          cls.getDeclaredFields.toList.filterNot(f =>
+            f.isSynthetic || java.lang.reflect.Modifier.isStatic(f.getModifiers))
+      a match {
+        // Make Strings look similar to their literal form.
+        case s: String =>
+          '"' + Seq("\n" -> "\\n", "\r" -> "\\r", "\t" -> "\\t", "\"" -> "\\\"", "\\" -> "\\\\").foldLeft(s) {
+            case (acc, (c, r)) => acc.replace(c, r) } + '"'
+        case xs: Seq[_] =>
+          xs.map(prettyPrint).toString
+        case xs: Array[_] =>
+          s"Array(${xs.map(prettyPrint) mkString ", "})"
+        // This covers case classes.
+        case p: Product =>
+          s"${p.productPrefix}(${
+            (getFields(p.getClass) map { f =>
+              f setAccessible true
+              s"${f.getName} = ${prettyPrint(f.get(p))}"
+            }) mkString ", "
+          })"
+        // General objects and primitives end up here.
+        case q =>
+          Option(q).map(_.toString).getOrElse("¡null!")
+      }
+    }*/
+
+
   }
 
 }

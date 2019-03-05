@@ -31,6 +31,9 @@ val circeDependencies = Seq(
 libraryDependencies ++= circeDependencies
 libraryDependencies += "play-circe" %% "play-circe" % "2.5-0.8.0"
 
+//libraryDependencies += "com.github.nikita-volkov" % "sext" % "0.2.5"
+//libraryDependencies += "com.lihaoyi" %% "pprint" % "0.5.3"
+
 resolvers ++= Seq(
   Resolver.mavenLocal,
   "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases",
