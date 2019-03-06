@@ -2,7 +2,7 @@
 
   {
     "name": "spark-job-launch",
-    "retryCount": 3,
+    "retryCount": 0,
     "timeoutSeconds": 1200,
     "inputKeys": [
       "input_spark_task"
@@ -18,7 +18,7 @@
 
   {
     "name": "call-service",
-    "retryCount": 3,
+    "retryCount": 0,
     "timeoutSeconds": 1200,
     "timeoutPolicy": "TIME_OUT_WF",
     "retryLogic": "FIXED",
@@ -28,7 +28,7 @@
 
   {
     "name": "decide-task",
-    "retryCount": 3,
+    "retryCount": 0,
     "timeoutSeconds": 1200,
     "timeoutPolicy": "TIME_OUT_WF",
     "retryLogic": "FIXED",
