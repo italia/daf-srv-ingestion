@@ -26,7 +26,7 @@
                     "val isCsv=${workflow.input.ingestionInput.isCsv}",
                     "val phUri = \"\"\"${workflow.input.ingestionInput.datasetPath}${workflow.input.ingestionInput.datasetName}\"\"\"",
                     "val csvChars = CsvChars( \"\"\"${workflow.input.ingestionInput.csvChars.quote}\"\"\", \"\"\"${workflow.input.ingestionInput.csvChars.delimiter}\"\"\", \"\"\"${workflow.input.ingestionInput.csvChars.escape}\"\"\" )",
-                    "SparkOperations.callValidateIngestedFile(None, file, isCsv, Some(csvChars), phUri)(spark)"
+                    "SparkOperations.callValidateIngestedFile(Some(schema), file, isCsv, Some(csvChars), phUri)(spark)"
             ],
             "authHeader": {
                 "name":"${workflow.input.ingestionInput.authHeader.name}",

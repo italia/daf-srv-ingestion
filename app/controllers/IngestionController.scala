@@ -165,7 +165,7 @@ class IngestionController @Inject()( configuration: Configuration, playSessionSt
           val createFeedWorkflow = Workflow("feed-creation", 1, Map("feedInput"->input))
 
           ConductorClient.startWorkflow(createFeedWorkflow).map{
-            case ok@Right(_) => Worker.startSingleWorkerCycle( "spark-job-launch", 5.seconds, 20.minutes,
+            case ok@Right(_) => Worker.startSingleWorkerCycle( "spark-job-launch", 5.seconds, 120.minutes,
                                                                 new LivyWork( "input_spark_task", "result", Array(DafConfig.apply.hadoopIngestionJarPath) )
                                                               )
                                 ok//Worker.startSingleRun("task_uno", 5.seconds, 5.minutes, 1.hour, new SparkWork(2.hour)); ok
@@ -210,7 +210,7 @@ class IngestionController @Inject()( configuration: Configuration, playSessionSt
           val createFeedWorkflow = Workflow("ingestion", 1, Map("ingestionInput"->input))
 
           ConductorClient.startWorkflow(createFeedWorkflow).map{
-            case ok@Right(_) => Worker.startSingleWorkerCycle( "spark-job-launch", 5.seconds, 20.minutes,
+            case ok@Right(_) => Worker.startSingleWorkerCycle( "spark-job-launch", 5.seconds, 120.minutes,
               new LivyWork( "input_spark_task", "result", Array(DafConfig.apply.hadoopIngestionJarPath) )
             )
               ok

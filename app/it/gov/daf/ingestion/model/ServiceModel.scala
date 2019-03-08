@@ -20,8 +20,8 @@ package it.gov.daf.ingestion.model
 
 import it.gov.daf.ingestion.model.ConductorModel.AuthHeader
 
-
-case class IngestionWorkflowInput( datasetName:String, isCsv:Boolean, file:String, archivePath:String, csvChars:Option[CsvChars],
+// for now this case class is the same of FeedWorkflowInput
+case class IngestionWorkflowInput( datasetName:String, isCsv:Boolean, file:String, archivePath:String, schemaString:String, csvChars:Option[CsvChars],
                                     datasetPath:String, dbName:String, tableName:String, authHeader: Option[AuthHeader], env:Option[Map[String,String]] ) extends PrettyPrintable
 
 case class FeedWorkflowInput( datasetName:String, isCsv:Boolean, file:String, archivePath:String, schemaString:String, csvChars:Option[CsvChars],
